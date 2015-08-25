@@ -1,0 +1,32 @@
+body{
+}
+.head {
+	background-color: #eee;
+	border-bottom: 1px solid #888;
+	box-shadow: 0 1px 3px #999;
+	height: 50px;
+	margin-bottom: 20px;
+}
+.container{
+
+}
+.left{
+	width:20%;
+	float:left;
+	margin-right:40px;
+}	
+.right{
+	width:80%;	
+	
+}
+.menu{
+	background-color: #eee;
+	border-radius: 10px;
+}
+.menu li{
+	/*border-bottom:1px solid #fff;*/
+	margin:2px;
+}
+#submit{
+	float: right;
+}

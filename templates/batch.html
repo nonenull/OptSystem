@@ -1,0 +1,209 @@
+$def with (data)
+<section class="content-header">
+   <h1> 批量操作 <small>Batch operation</small> </h1> 
+   <ol class="breadcrumb"> 
+    <li><a href="/"><i class="fa fa-home"></i>Home</a></li> 
+    <li class="active">批量操作</li> 
+  </ol> 
+</section> 
+<!-- 页面头部 --> 
+<style>
+  .edit_button .btn{
+    width:100px !important;float:left;margin:10px;
+  }
+  .selected {
+    background-color: #3c8dbc !important;
+  }
+  .shell_history_content{
+    height: 500px;
+
+    /*position:absolute;*/
+    bottom:0px;
+    vertical-align:bottom;
+    display:table-cell; 
+    white-space:normal;
+  }
+  .shell_history_content pre{
+    border: 0;
+  }
+  .shell_history{
+    border:1px solid #000000; 
+    OVERFLOW-Y: auto;
+    OVERFLOW-X:auto;
+    background-color: #eee;
+    width:100%;
+    height: 500px;
+  }
+  #shell_textarea{
+    overflow-y:visible;
+    width:100%;
+  }
+</style>
+<!-- 页面内容 --> 
+<section class="content"> 
+  <div class="row"> 
+   <div class="col-xs-12"> 
+    <div class="box"> 
+    <div class="box-header"> 
+      <h5>提示: 先选取要操作的服务器，然后再点击相应的按钮</h5> 
+      <div class="row">
+        <div class="col-sm-4">
+          <div class="edit_button">
+            <button id="terminal_button" class="btn btn-block btn-primary" data-toggle="modal" data-target="#terminal">Terminal</button>
+            <!-- <button id="terminal_button" class="btn btn-block btn-primary">Terminal</button> -->
+            <button class="btn btn-block btn-warning">Sftp</button>
+          </div>
+        </div>
+        <div class="col-sm-5">
+          <div class="btn-group margin pull-center">
+            <button class="btn btn-info" type="button" id="SelectAll">全选</button>
+            <button class="btn btn-info" type="button" id="ReverseSelection">反选</button>
+            <button class="btn btn-info" type="button" id="CancelSelection">取消</button>
+          </div>
+        </div>
+        <div class="col-sm-3">
+         <form method="post" id="search">
+          <select name="search_type" class="pull-left form-control" style="width:90px;text-align: center;">
+            <option value="ip">ip</option>
+            <option value="hostname">主机名</option>
+            <option value="services">业务</option>
+            <option value="machine_room">机房</option>
+            <option value="description">描述</option>
+          </select>
+          <div class="input-group margin">
+            <input type="text" class="form-control" placeholder="服务器搜索" name="search_word">
+            <span class="input-group-btn">
+              <button type="submit" class="btn btn-info btn-flat" >搜索</button>
+            </span>
+          </div>
+        </form>
+        </div>
+      </div>
+    </div>
+     <!-- /.box-header --> 
+     <div class="box-body"> 
+      <div class="dataTables_wrapper form-inline dt-bootstrap">
+       <div class="row">
+        <div class="col-sm-12">
+          <table id="server" class="table table-striped table-bordered table-hover " cellspacing="0" width="100%">
+            <thead>
+              <tr>
+                <th>主机名</th>
+                <th>IP 地址</th>
+                <th>业务</th>
+                <th>机房</th>
+                <th>描述</th>
+              </tr>
+            </thead>
+            <tbody>
+              $for server in data:
+                <tr sid='$server[0]' user='$server[3]' ><th>$server[1]</th><th>$server[2]</th><th>$server[4]</th><th>$server[5]</th><th>$server[6]</th></tr>
+            </tbody>
+          </table>
+        </div>
+       </div>
+     <!-- /.box-body --> 
+    </div>
+    <!-- /.box --> 
+   </div>
+   <!-- /.col --> 
+  </div>
+</section> 
+  <!-- 页面内容结束 -->
+
+<!-- Terminal Modal -->
+<div class="modal fade" id="terminal" tabindex="-1" role="dialog" aria-labelledby="terminal_title">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="terminal_title">Terminal——批量远程 shell 命令执行</h4>
+      </div>
+      <div class="modal-body">
+        <div class="shell_history">
+          <div class="shell_history_content"><pre>111111111111111111</pre></div>
+        </div>
+        <div><span id="host_name">SHELL# </span><textarea id="shell_textarea" placeholder="请输入命令">1112312321</textarea></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-info pull-left" id="selected_list">查看选中列表</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+        <button type="button" class="btn btn-primary" id="executive">执行</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Terminal Modal End -->
+
+<script type="text/javascript">
+  //点击服务器列表 变色
+  jQuery("#server tbody").on("click","tr",function(){
+    jQuery(this).toggleClass('selected');
+  });
+
+  //选择所有服务器 变色
+  jQuery("#SelectAll").click(function(){
+    jQuery("#server tbody tr").addClass('selected');
+  });
+
+  //反选
+  jQuery("#ReverseSelection").click(function(){
+    jQuery("#server tbody tr").toggleClass('selected');
+  });
+
+  //取消选择
+  jQuery("#CancelSelection").click(function(){
+    jQuery("#server tbody tr").removeClass('selected');
+  });
+
+  //搜索
+  jQuery("#search").submit(function(){
+    jQuery.post('/batch/search',jQuery(this).serialize(),function(result){
+        var str;
+        var result = jQuery.parseJSON(result);
+        for(i=0;i<result.length;++i){
+          str += "<tr sid='"+result[i][0]+"' user='"+result[i][3]+"'><th>"+result[i][1]+"</th><th>"+result[i][2]+"</th><th>"+result[i][4]+"</th><th>"+result[i][5]+"</th><th>"+result[i][6]+"</th></tr>"; 
+        }
+        jQuery("#server tbody").html(str);
+    });
+    return false;
+  });
+
+  //如果没有选中服务器，弹出警告。
+  jQuery("#terminal_button").click(function(){
+    if(jQuery("#server tbody tr[class='selected']").length < 1){
+      alert("没有选择服务器");
+      return false;
+    }
+  });
+
+  //执行
+  jQuery("#executive").click(function(){
+    var sid = new Array();
+    jQuery("#server tbody tr[class='selected']").each(function(){
+      sid.push(jQuery(this).attr('sid'));
+    });
+    //alert(sid);
+    //提交
+    var command = jQuery("#shell_textarea").val();
+    post_str = "&command="+command+"&sid[]="+sid.join('&sid[]=');
+    // alert(post_str);
+    // return false;
+    jQuery.post("/batch/executive",post_str,function(result){
+      //jQuery(".shell_history_content").append("<pre><div>"+"SHELL# "+jQuery("#shell_textarea").val()+"</div>"+result+"</pre>");
+      title = result.split("/");
+      jQuery(".shell_history_content").append("<pre><div>SHELL# "+command+"</div><a target='_blank' href='"+result+"'>"+title[2]+"</a></pre>");
+      //jQuery("#shell_textarea").val("");
+    });
+
+  });
+
+  //弹出已选列表
+  jQuery("#selected_list").click(function(){
+    var ip = "";
+    jQuery("#server tbody tr[class='selected']").each(function(){
+      ip += jQuery(this).find('th:eq(1)').html()+"\n";
+    });
+    alert(ip);
+  });
+</script>

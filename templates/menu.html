@@ -1,0 +1,118 @@
+$def with (data)
+<section class="content-header">
+   <h1> 菜单管理 <small>Menu management</small> </h1>
+   <ol class="breadcrumb"> 
+    <li><a href="/"><i class="fa fa-home"></i>Home</a></li> 
+    <li class="active">菜单管理</li>
+  </ol> 
+</section> 
+<!-- 页面头部 --> 
+<style>
+  .edit_button .btn{
+    width:100px !important;float:left;margin:10px;
+  }
+  .selected {
+    background-color: #3c8dbc !important;
+  }
+  .shell_history_content{
+    height: 500px;
+
+    /*position:absolute;*/
+    bottom:0px;
+    vertical-align:bottom;
+    display:table-cell; 
+    white-space:normal;
+  }
+  .shell_history_content pre{
+    border: 0;
+  }
+  .shell_history{
+    border:1px solid #000000; 
+    OVERFLOW-Y: auto;
+    OVERFLOW-X:auto;
+    background-color: #eee;
+    width:100%;
+    height: 500px;
+  }
+  #shell_textarea{
+    overflow-y:visible;
+    width:100%;
+  }
+</style>
+<!-- 页面内容 -->
+<section class="content">
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="box">
+        <div class="box-header">
+          <h5>提示: 先选取要操作的服务器，然后再点击相应的按钮</h5>
+
+<!--          <div class="row">
+            <div class="col-sm-4">
+              <div class="edit_button">
+                <button id="terminal_button" class="btn btn-block btn-primary" data-toggle="modal"
+                        data-target="#terminal">Terminal
+                </button>
+                &lt;!&ndash; <button id="terminal_button" class="btn btn-block btn-primary">Terminal</button> &ndash;&gt;
+                <button class="btn btn-block btn-warning">Sftp</button>
+              </div>
+            </div>
+            <div class="col-sm-5">
+              <div class="btn-group margin pull-center">
+                <button class="btn btn-info" type="button" id="SelectAll">全选</button>
+                <button class="btn btn-info" type="button" id="ReverseSelection">反选</button>
+                <button class="btn btn-info" type="button" id="CancelSelection">取消</button>
+              </div>
+            </div>
+            <div class="col-sm-3">
+              <form method="post" id="search">
+                <select name="search_type" class="pull-left form-control" style="width:90px;text-align: center;">
+                  <option value="ip">ip</option>
+                  <option value="hostname">主机名</option>
+                  <option value="services">业务</option>
+                  <option value="machine_room">机房</option>
+                  <option value="description">描述</option>
+                </select>
+                <div class="input-group margin">
+                  <input type="text" class="form-control" placeholder="服务器搜索" name="search_word">
+            <span class="input-group-btn">
+              <button type="submit" class="btn btn-info btn-flat">搜索</button>
+            </span>
+                </div>
+              </form>
+            </div>
+          </div>-->
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+          <div class="dataTables_wrapper form-inline dt-bootstrap">
+           <div class="row">
+            <div class="col-sm-12">
+              <table id="users" class="table table-striped table-bordered table-hover" cellspacing="0" width="100%">
+                <thead>
+                  <tr>
+                    <th>账号</th>
+                    <th>全名</th>
+                    <th>职位</th>
+                    <th>手机</th>
+                    <th>邮箱</th>
+                    <th>权限</th>
+                    <th>注册时间</th>
+                    <th>最后更新时间</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  $for user in data:
+                    <tr sid='$user[0]' ><th>$user[1]</th><th>$user[2]</th><th>$user[3]</th><th>$user[4]</th><th>$user[5]</th><th><a id="role" href="#$user[6]">点击查看详细权限</a></th><th>$user[7]</th><th>$user[8]</th></tr>
+                </tbody>
+              </table>
+            </div>
+           </div>
+         <!-- /.box-body -->
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section> 
+  <!-- 页面内容结束 -->

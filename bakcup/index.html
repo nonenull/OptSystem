@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<title>Hello from Flask</title>
+	<!-- 新 Bootstrap 核心 CSS 文件 -->
+	<link rel="stylesheet" href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css">
+	<!-- 可选的Bootstrap主题文件（一般不用引入） -->
+	<link rel="stylesheet" href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+	<!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+	<script src="//cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
+	<!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+	<script src="//cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+	<link rel="stylesheet" href="/static/css/index.css">
+</head>
+<body>
+<div class="head">
+	<nav class="navbar navbar-default">
+	  <div class="container-fluid">
+	    <!-- Brand and toggle get grouped for better mobile display -->
+	    <div class="navbar-header">
+	      <a class="navbar-brand" href="/">运维综合管理系统</a>
+	    </div>
+
+	    <!-- Collect the nav links, forms, and other content for toggling -->
+	    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+	      <ul class="nav navbar-nav">
+	        <li class="active"><a href="#">首页</a></li>
+	        <li><a href="#">用户管理</a></li>
+	        <li><a href="#">资产管理</a></li>
+	      </ul>
+	    </div><!-- /.navbar-collapse -->
+	  </div><!-- /.container-fluid -->
+	</nav>
+</div>
+<div class="container">
+	<div class="row">
+		<div class="col-md-2">
+			<ul class="nav nav-pills nav-stacked menu" role="tablist">
+			  <li role="presentation" class="active"><a href="#index" aria-controls="index" role="tab" data-toggle="tab">主页</a></li>
+			  <li role="presentation"><a href="#ssh" aria-controls="ssh" role="tab" data-toggle="tab">远程命令</a></li>
+			  <li role="presentation"><a href="#scp" aria-controls="scp" role="tab" data-toggle="tab">文件传输</a></li>
+			</ul>
+		</div>
+		<div class="col-md-10">
+			<div class="tab-content">
+				<div id="index" role="tabpanel" class="tab-pane active">
+					33333333	
+				</div>
+				<div id="ssh" role="tabpanel" class="tab-pane">
+					<div class="form-group">
+						<label for="command">批量命令执行</label>
+						<textarea class="form-control" rows="10" id="command" placeholder="请输入需要执行的命令"></textarea>
+					</div>
+					<button id="submit" class="btn btn-default" type="submit">提交命令</button>
+				</div>
+				<div id="scp" role="tabpanel" class="tab-pane">
+					111111111
+				</div>
+			</div>			
+		</div>
+	</div>
+</div>
+<script>
+$("#submit").click(function(){
+	alert($("textarea").val());
+});
+</script>
+</body>
+</html>
