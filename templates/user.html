@@ -1,4 +1,4 @@
-$def with (data,button)
+$def with (data,role_data,button)
 <section class="content-header">
    <h1> 用户管理 <small>User management</small> </h1>
    <ol class="breadcrumb"> 
@@ -8,8 +8,8 @@ $def with (data,button)
 </section> 
 <!-- 页面头部 --> 
 <style>
-  .edit_button .btn{
-    width:100px !important;float:left;margin:10px;
+  .edit_button .btn-block{
+    width:100px !important;margin:10px;float:left;
   }
   .selected {
     background-color: #3c8dbc !important;
@@ -54,6 +54,232 @@ $def with (data,button)
           <div class="edit_button">
             $for i in button:
               <button class="btn btn-block btn-primary" data-toggle="modal" data-target="#$i[1]">$i[0]</button>
+              $if i[1] == 'create_user':
+                <!-- create_user Modal -->
+                <div class="modal fade" id="create_user" tabindex="-1" role="dialog" aria-labelledby="terminal_title">
+                  <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="terminal_title">新建用户</h4>
+                      </div>
+                      <div class="modal-body">
+                        <form id="create_user_form" class="form-horizontal" style="width:800px">
+                          <div class="form-group">
+                            <label class="col-sm-2 control-label" for="account">帐号</label>
+                            <div class="col-sm-10">
+                              <input type="text" placeholder="帐号" name="account" class="form-control">
+                              <div class="input_notice">格式：纯字母,3-20位</div>
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <label class="col-sm-2 control-label" for="full_name">姓名</label>
+                            <div class="col-sm-10">
+                              <input type="text" placeholder="姓名" name="full_name" class="form-control">
+                              <div class="input_notice">格式：1-5个汉字</div>
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <label class="col-sm-2 control-label" for="password">密码</label>
+                            <div class="col-sm-10">
+                              <input type="password" placeholder="密码" name="password" class="form-control">
+                              <div class="input_notice">格式：4-15位,字母开头，允许字母数字和_!@#%^&特殊字符</div>
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <label class="col-sm-2 control-label" for="repassword">密码确认</label>
+                            <div class="col-sm-10">
+                              <input type="password" placeholder="密码确认" name="repassword" class="form-control">
+                              <div class="input_notice">格式：重复输入以上密码</div>
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <label class="col-sm-2 control-label" for="position">职位</label>
+                            <div class="col-sm-10">
+                              <input type="text" placeholder="职位" name="position" class="form-control">
+                              <div class="input_notice">格式：允许中英文，10个字符</div>
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <label class="col-sm-2 control-label" for="phone">手机</label>
+                            <div class="col-sm-10">
+                              <input type="text" placeholder="手机" name="phone" class="form-control">
+                              <div class="input_notice">格式：11位数的手机号码</div>
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <label class="col-sm-2 control-label" for="email">邮箱</label>
+                            <div class="col-sm-10">
+                              <input type="email" placeholder="邮箱" name="email" class="form-control">
+                              <div class="input_notice">格式：xxx@xxx.com</div>
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <label class="col-sm-2 control-label" for="jurisdiction">权限角色</label>
+                            <div class="col-sm-10">
+                              <!--<input type="text" placeholder="权限" name="jurisdiction" class="form-control">-->
+                              <select class="form-control" name="jurisdiction">
+                                <option selected="selectd"  value="">请选择角色</option>
+                                $for i in role_data:
+                                      <option value="$i[0]">$i[1]</option>
+                              </select>
+                              <div class="input_notice">格式：1-5个汉字</div>
+                            </div>
+                          </div>
+                        </form>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <button type="button" class="btn btn-primary" id="create_user_submit">新建用户</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <script>
+                  // input 焦点离开判断输入是否合法
+                  jQuery("#create_user_form input").blur(function(){
+                    var this_input = jQuery(this);
+                    //验证帐号，纯字母,3-20位
+                    if(this_input.attr("name") == "account"){
+                      var status = /^[a-z]{3,20}$$/.test(this_input.val());
+                      messages = "帐号格式错误";
+                    }else if(this_input.attr("name")=="full_name"){
+                      //验证姓名，1-5个汉字
+                      var status = /^[\u4e00-\u9fa5]{1,5}$$/.test(this_input.val());
+                      messages = "姓名格式错误";
+                    }else if(this_input.attr("name")=="password"){
+                      //验证密码，4-15位,字母开头，允许字母数字和"_!@#%^&"特殊字符
+                      var status = /^[a-zA-Z][a-zA-Z0-9_!@#%^&]{4,15}$$/.test(this_input.val());
+                      messages = "密码格式错误";
+                    }else if(this_input.attr("name")=="repassword"){
+                      //密码确认
+                      var repassword = jQuery("#create_user_form input[name='password']").val();
+                      status = repassword == this_input.val() && repassword;
+                      messages = "密码为空或者不一致";
+                    }else if(this_input.attr("name")=="position"){
+                      //验证职位
+                      var status = /^^[\u4e00-\u9fa5a-zA-Z]{0,10}$$/.test(this_input.val());
+                      messages = "职位格式错误";
+                    }else if(this_input.attr("name")=="phone"){
+                      //验证手机
+                      var status = /^^[1][3578][0-9]{9}$$/.test(this_input.val());
+                      messages = "手机格式错误";
+                    }else if(this_input.attr("name")=="email"){
+                      //验证邮箱
+                      var status = /^[\w!#$$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/.test(this_input.val());
+                      messages = "邮箱格式错误";
+                    }else{
+                     //未知输入框
+                    }
+                    result(this_input,status,messages);
+                  })
+
+                  //处理并显示验证结果
+                  function result(obj,status,messages){
+                      if(status){
+                        obj.parent().removeClass("has-error").addClass("has-success");
+                      }else{
+                        //将input框设置为红色error状态
+                        obj.parent().removeClass("has-success").addClass("has-error");
+                        //发生错误的input框 振动提示
+                        obj.effect("shake",{times:3},500);
+                        //显示错误提示并在8秒后消失
+                        jQuery("#create_user_form").append("<div style='text-align:center;color:#f25d8e;'>"+messages+"</div>").children().last().fadeOut(8000);
+                      }
+                  }
+
+                  //执行新建用户
+                  jQuery("#create_user_submit").click(function(){
+                    if(jQuery('.col-sm-10 ').hasClass('has-error')){
+                      alert('输入的数据存在错误');
+                      return false;
+                    }
+                    var user_data = jQuery("#create_user_form").serialize();
+                    jQuery.post("/admin/user/create",user_data,function(result){
+                      if(result === '1'){
+                        alert('添加成功');
+                        //隐藏表单框
+                        jQuery('#create_user').modal('hide');
+                        //延迟1秒重新加载`用户管理`页面，这里不延迟会导致jQuery('#create_user').modal('hide') model背景来不及收起来
+                        setTimeout(function () {
+                          jQuery(".content-wrapper").load(
+                            "/admin/user",
+                            function(response,status){
+                              if(status != "success"){
+                                alert("页面加载失败");
+                              }
+                          });
+                        }, 1000);
+
+                      }else{
+                        alert(result);
+                      }
+                    });
+                  });
+                </script>
+                <!-- create_user Modal End -->
+              $if i[1] == 'delete_user':
+                <!-- delete_user Modal -->
+                <div class="modal fade" id="delete_user" tabindex="-1" role="dialog" aria-labelledby="terminal_title">
+                  <div class="modal-dialog modal-sm" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="terminal_title">即将删除的帐号</h4>
+                      </div>
+                      <div class="modal-body">
+                        <form id="delete_user_form" class="form-horizontal">
+                          <div class="form-group">
+                            <!--<label class="col-sm-2 control-label" for="delete_account">即将删除的帐号</label>-->
+                            <div class="col-sm-10">
+                              <input type="text" class="form-control" disabled>
+                            </div>
+                          </div>
+                        </form>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <button type="button" class="btn btn-primary" id="delete_user_submit">确定删除</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <script>
+                  //点击删除按钮
+                  jQuery('.edit_button .btn-block[data-target="#delete_user"]').click(function(){
+                    if(jQuery("table tbody tr[class='selected']").length < 1){
+                      alert("没有选择服务器");
+                      return false;
+                    }else{
+                      jQuery('#delete_user_form input').val(jQuery("#users tbody tr[class='selected']").children().first().html());
+                    }
+                  })
+                  //删除用户
+                  jQuery("#delete_user_submit").click(function(){
+                    jQuery.post('/admin/user/delete',{'delete_account':jQuery("#delete_user_form input").val()},function(data){
+                      if(data == '1'){
+                        alert('删除成功');
+                        //隐藏delete_user Model
+                        jQuery('#delete_user').modal('hide');
+                        //延迟1秒重新加载`用户管理`页面，这里不延迟会导致jQuery('#delete_user').modal('hide') model背景来不及收起来
+                        setTimeout(function () {
+                          jQuery(".content-wrapper").load(
+                            "/admin/user",
+                            function(response,status){
+                              if(status != "success"){
+                                alert("页面加载失败");
+                              }
+                          });
+                        }, 1000);
+                      }else if((data == '0')){
+                        alert('删除失败');
+                      }else{
+                        alert(data);
+                      }
+                    })
+                  });
+                </script>
+                <!-- delete_user Modal End -->
           </div>
         </div>
         <div class="col-sm-5">
@@ -71,7 +297,7 @@ $def with (data,button)
             <option value="description">权限</option>
           </select>
           <div class="input-group margin">
-            <input type="text" class="form-control" placeholder="服务器搜索" name="search_word">
+            <input type="text" class="form-control" placeholder="用户搜索" name="search_word">
             <span class="input-group-btn">
               <button type="submit" class="btn btn-info btn-flat" >搜索</button>
             </span>
@@ -93,7 +319,7 @@ $def with (data,button)
                 <th>职位</th>
                 <th>手机</th>
                 <th>邮箱</th>
-                <th>角色ID(权限)</th>
+                <th>权限角色名</th>
                 <th>注册时间</th>
                 <th>最后更新时间</th>
               </tr>
@@ -114,75 +340,7 @@ $def with (data,button)
 </section> 
   <!-- 页面内容结束 -->
 
-<!-- create_user Modal -->
-<div class="modal fade" id="create_user" tabindex="-1" role="dialog" aria-labelledby="terminal_title">
-  <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="terminal_title">新建用户</h4>
-      </div>
-      <div class="modal-body">
-        <form id="create_user_form" class="form-horizontal" style="width:800px">
-          <div class="form-group">
-            <label class="col-sm-2 control-label" for="account">帐号</label>
-            <div class="col-sm-10">
-              <input type="text" placeholder="帐号" name="account" class="form-control">
-              <div class="input_notice">格式：纯字母,3-20位</div>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-2 control-label" for="full_name">姓名</label>
-            <div class="col-sm-10">
-              <input type="text" placeholder="姓名" name="full_name" class="form-control">
-              <div class="input_notice">格式：1-5个汉字</div>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-2 control-label" for="password">密码</label>
-            <div class="col-sm-10">
-              <input type="password" placeholder="密码" name="password" class="form-control">
-              <div class="input_notice">格式：4-15位,字母开头，允许字母数字和_!@#%^&特殊字符</div>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-2 control-label" for="repassword">密码确认</label>
-            <div class="col-sm-10">
-              <input type="password" placeholder="密码确认" name="repassword" class="form-control">
-              <div class="input_notice">格式：重复输入以上密码</div>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-2 control-label" for="phone">手机</label>
-            <div class="col-sm-10">
-              <input type="text" placeholder="手机" name="phone" class="form-control">
-              <div class="input_notice">格式：11位数的手机号码</div>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-2 control-label" for="email">邮箱</label>
-            <div class="col-sm-10">
-              <input type="email" placeholder="邮箱" name="email" class="form-control">
-              <div class="input_notice">格式：xxx@xxx.com</div>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-2 control-label" for="jurisdiction">权限</label>
-            <div class="col-sm-10">
-              <input type="text" placeholder="权限" name="jurisdiction" class="form-control">
-              <div class="input_notice">格式：1-5个汉字</div>
-            </div>
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-        <button type="button" class="btn btn-primary" id="create_user_submit">新建用户</button>
-      </div>
-    </div>
-  </div>
-</div>
-<!-- create_user Modal End -->
+
 <script type="text/javascript">
   //点击查看权限
   jQuery("#users tbody tr").on('click','a',function(){
@@ -216,74 +374,4 @@ $def with (data,button)
       return false;
     }
   });
-
-  // input 焦点离开判断输入是否合法
-  jQuery("#create_user_form input").blur(function(){
-    var this_input = jQuery(this);
-    //验证帐号，纯字母,3-20位
-    if(this_input.attr("name") == "account"){
-      var status = /^[a-z]{3,20}$$/.test(this_input.val());
-      messages = "帐号格式错误";
-    }else if(this_input.attr("name")=="full_name"){
-      //验证姓名，1-5个汉字
-      var status = /^[\u4e00-\u9fa5]{1,5}$$/.test(this_input.val());
-      messages = "姓名格式错误";
-    }else if(this_input.attr("name")=="password"){
-      //验证密码，4-15位,字母开头，允许字母数字和"_!@#%^&"特殊字符
-      var status = /^[a-zA-Z][a-zA-Z0-9_!@#%^&]{4,15}$$/.test(this_input.val());
-      messages = "密码格式错误";
-    }else if(this_input.attr("name")=="repassword"){
-      //密码确认
-      var repassword = jQuery("#create_user_form input[name='password']").val();
-      status = repassword == this_input.val() && repassword;
-      messages = "密码为空或者不一致";
-    }else if(this_input.attr("name")=="phone"){
-      //验证手机
-      var status = /^^[1][3578][0-9]{9}$$/.test(this_input.val());
-      messages = "手机格式错误";
-    }else if(this_input.attr("name")=="email"){
-      //验证邮箱
-      var status = /^[\w!#$$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/.test(this_input.val());
-      messages = "邮箱格式错误";
-    }else if(this_input.attr("name")=="jurisdiction"){
-      //权限验证
-      var status = /^[\w!#$$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/.test(this_input.val());
-      messages = "权限格式错误";
-    }else{
-     //未知输入框
-    }
-    result(this_input,status,messages);
-  })
-
-  //处理并显示验证结果
-  function result(obj,status,messages){
-      if(status){
-        obj.parent().removeClass("has-error").addClass("has-success");
-      }else{
-        //将input框设置为红色error状态
-        obj.parent().removeClass("has-success").addClass("has-error");
-        //发生错误的input框 振动提示
-        obj.effect("shake",{times:3},500);
-        //显示错误提示并在8秒后消失
-        jQuery("#create_user_form").append("<div style='text-align:center;color:#f25d8e;'>"+messages+"</div>").children().last().fadeOut(8000);
-      }
-  }
-
-  //执行新建用户
-  jQuery("#create_user_submit").click(function(){
-    if(jQuery('.col-sm-10 ').hasClass('has-error')){
-      alert('输入的数据存在错误');
-      return false;
-    }
-    var user_data = jQuery("#create_user_form").serialize();
-    jQuery.post("/admin/user",user_data,function(result){
-      if(result){
-        alert('添加成功');
-      }else{
-        alert(result);
-      }
-    });
-
-  });
-
 </script>

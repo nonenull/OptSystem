@@ -24,10 +24,18 @@ class Model():
 	def insert(self,sql):
 		try:
 			count = cur.execute(sql)
-			result = conn.commit()
-			return result
-		except:
-			print "Mysql插入失败"
+			conn.commit()
+			return count
+		except Exception as e:
+			print "Mysql插入失败",e
+
+	def delete(self,sql):
+		try:
+			count = cur.execute(sql)
+			conn.commit()
+			return count
+		except Exception as e:
+			print "Mysql插入失败",e
 
 	def __del__(self):
 		#操作完成释放 MySQL 连接

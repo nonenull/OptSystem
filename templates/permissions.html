@@ -187,7 +187,12 @@ $def with (data,button)
 <script type="text/javascript">
   //点击查看权限
   jQuery("#users tbody tr").on('click','a',function(){
-    jQuery.post('/admin/permissions',{'menu_id':jQuery(this).attr("href")},function(data){complete(data)});
+    var menu_id = jQuery(this).attr("href");
+    if(menu_id==''){
+      alert('完整权限');
+    }else{
+      jQuery.post('/admin/permissions',{'menu_id':jQuery(this).attr("href")},function(data){complete(data)});
+    }
     return false;
   });
 

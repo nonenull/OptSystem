@@ -3060,10 +3060,6 @@ table.text-center,table.text-center td,table.text-center th {
 	border-bottom-color: #f4f4f4
 }
 
-.modal-footer {
-	border-top-color: #f4f4f4
-}
-
 .modal-primary .modal-header,.modal-primary .modal-footer {
 	border-color: #307095
 }

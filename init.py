@@ -4,6 +4,7 @@ from model import Model
 import json
 from batch import Batch
 import web.db
+import time
 
 # 设置模板位置
 render = web.template.render('templates/')
@@ -15,6 +16,10 @@ urls = (
     '/', 'INDEX',
     '/error', 'ERROR',
     '/admin/user', 'USER',
+    '/admin/user/create', 'CREATE_USER',
+    '/admin/user/edit', 'EDIT_USER',
+    '/admin/user/delete', 'DELETE_USER',
+    '/admin/position', 'POSITION',
     '/admin/permissions','PERMISSIONS',
     '/login', 'LOGIN',
     '/login/auth', 'AUTH',
@@ -110,39 +115,84 @@ class USER:
         menu_id = PUBLIC().check_permissions('用户管理')
         # 获取页面按钮
         button = PUBLIC().get_button(menu_id)
-        user_data = Model().select("select id,username,full_name,position,mobile_phone,email,role_id,registered_time,update_time from opt_user")
+        user_data = Model().select("SELECT a.id,a.username,a.full_name,a.position,a.mobile_phone,a.email,b.role_name,a.registered_time,a.update_time FROM opt_user AS a, opt_role AS b WHERE a.role_id = b.id")
         # print user_data
-        return render.user(data=user_data,button=button)
+        role_data = Model().select("select id,role_name from opt_role where id !=0")
+        return render.user(data=user_data,role_data=role_data,button=button)
+
+#创建用户
+class CREATE_USER:
     def POST(self):
         import re
-        messages=''
+        #初始化messages
+        messages = ''
         data = web.input()
-         # 验证帐号，纯字母,3-20位
-        if re.match('^[a-z]{3,20}',data.account) is None:
-          messages += "帐号格式错误"
-        if re.match('^[\u4e00-\u9fa5]{1,5}',data.full_name) is None:
-          # 验证姓名，1-5个汉字
-          messages += "姓名格式错误"
+        #判断用户是否存在
+        user_exist = Model().select("select count(1) from opt_user where `username`='%s'" % (data.account))
+        if user_exist[0][0] == 1:
+            messages = "帐号已经存在\n"
+
+        # 验证帐号，纯字母,3-20位
+        if re.match("^[a-z]{3,20}",data.account) is None:
+          messages = "帐号格式错误\n"
+
+        # 验证姓名，1-5个汉字
+        if re.match(u'^[\u4e00-\u9fa5]{1,5}',data.full_name) is None:
+          messages += "姓名格式错误\n"
+
+        # 验证密码，4-15位,字母开头，允许字母数字和"_!@#%^&"特殊字符
         if re.match('^[a-zA-Z][a-zA-Z0-9_!@#%^&]{4,15}',data.password) is None:
-          # 验证密码，4-15位,字母开头，允许字母数字和"_!@#%^&"特殊字符
-          messages += "密码格式错误"
+          messages += "密码格式错误\n"
+
+        # 密码确认
         if data.password != data.repassword:
-          # 密码确认
-          messages += "密码不一致"
+          messages += "密码不一致\n"
+
+        # 验证职位
+        if re.match(u'^[\u4e00-\u9fa5a-zA-Z]{0,10}$',data.position) is None:
+          messages += "职位格式错误\n"
+
+        # 验证手机
         if re.match("^[1][3578][0-9]{9}",data.phone) is None:
-          # 验证手机
-          messages += "手机格式错误"
-        if re.match("^[\w!#$$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?",data.email) is None:
-          #/验证邮箱
-          messages += "邮箱格式错误"
-        if re.match("^[\w!#$$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?",data.jurisdiction) is None:
-          # 权限验证
-          messages += "权限格式错误"
-        else:
-            # 未知输入框
-            pass
+          messages += "手机格式错误\n"
+
+        #验证邮箱
+        if re.match("^[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?",data.email) is None:
+          messages += "邮箱格式错误\n"
+
+        # 权限验证
+        if data.jurisdiction == '':
+          messages += "权限格式错误\n"
+
+        #如果判断messages为空，即没有错误。将用户信息写入数据库
+        if messages is '':
+            sql = "insert into opt_user (username, password, full_name, mobile_phone, email,position, role_id, registered_time) values ('%s','%s','%s','%s','%s','%s','%s','%s')"%(data.account, data.password, data.full_name, data.phone, data.email,data.position, data.jurisdiction, time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+            messages = Model().insert(sql)
+
         web.header('Content-Type','text/html; charset=utf-8', unique=True)
         return messages
+
+#编辑用户
+class EDIT_USER:
+    pass
+
+#删除用户
+class DELETE_USER:
+    def POST(self):
+        account = web.input().delete_account
+        if account == 'admin':
+            return '内置admin账户不可删除'
+        elif account == session.user[0]:
+            return '不能删除自己'
+        sql = "delete from opt_user where username='%s'"%(account)
+        status = Model().delete(sql)
+        return status
+
+
+#职位管理
+class POSITION:
+    def GET(self):
+        return render.position()
 
 # 权限管理页面
 class PERMISSIONS:
